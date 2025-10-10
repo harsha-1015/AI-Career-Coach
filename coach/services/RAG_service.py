@@ -6,15 +6,17 @@ from ..config import VECTOR_DB_KEY, VECTOR_DB_HOST
 
 
 class RAG:
-    def __init__(self,user_query):
-        self.user_query=user_query
-        self.retrived_info=self._get_relavent_info(user_query)
+    def __init__(self):
+        self.user_query=None
         
+    def _get_user_query(self,query)->None:
+        if not self.user_query:
+            self.user_query=query
     
-    def _get_relavent_info(self,query)->list:
+    def _get_relavent_info(self)->list:
         pc = Pinecone(api_key=VECTOR_DB_KEY)
         index=pc.Index(host=VECTOR_DB_HOST)   
-        retrive=Retrival(index,query)
+        retrive=Retrival(index,self.user_query)
         return retrive.retrived_info
     
     def classify_query_hybrid(self,query: str) -> str:
@@ -28,6 +30,7 @@ class RAG:
 
     
     def _call_llm(self)->None:
+        relavent_info=self._get_relavent_info(self.user_query)
         example_json_map={
                             "title": "Data Scientist Roadmap",
                             "nodes": [
@@ -55,13 +58,13 @@ class RAG:
                 {self.user_query}
 
                 Relevant Information:
-                {self.retrived_info}
+                {relavent_info}
 
                 Output:
                 """
                 
         prompt_Roadmap=f"""return only the Json graph representation in form of {example_json_map} 
-                        for the user query {self.user_query} and the relavent information is {self.retrived_info}"""
+                        for the user query {self.user_query} and the relavent information is {relavent_info}"""
                         
         llm=LLM()
         query_classifier=self.classify_query_hybrid(self.user_query)

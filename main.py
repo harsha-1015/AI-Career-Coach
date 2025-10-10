@@ -6,6 +6,7 @@ import ast
 import sys
 from io import StringIO
 
+rag=RAG()
 app = Flask(__name__)
 CORS(app, resources={
     r"/*": {
@@ -27,7 +28,7 @@ def ask_coach():
         old_stdout = sys.stdout
         sys.stdout = captured_output = StringIO()
 
-        rag = RAG(user_query)
+        rag._get_user_query(user_query)
         rag._call_llm()
 
         sys.stdout = old_stdout
