@@ -10,8 +10,7 @@ class RAG:
         self.user_query=None
         
     def _get_user_query(self,query)->None:
-        if not self.user_query:
-            self.user_query=query
+        self.user_query=query
     
     def _get_relavent_info(self)->list:
         pc = Pinecone(api_key=VECTOR_DB_KEY)
@@ -29,52 +28,45 @@ class RAG:
         return "notRoadmap"
 
     
-    def _call_llm(self)->None:
-        relavent_info=self._get_relavent_info(self.user_query)
-        example_json_map={
-                            "title": "Data Scientist Roadmap",
-                            "nodes": [
-                                {"id": "1", "label": "Learn Python"},
-                                {"id": "2", "label": "Learn Statistics"},
-                                {"id": "3", "label": "Master Pandas & NumPy"},
-                                {"id": "4", "label": "Learn Machine Learning"},
-                                {"id": "5", "label": "Build Projects"}
-                            ],
-                            "edges": [
-                                {"from": "1", "to": "3"},
-                                {"from": "2", "to": "4"},
-                                {"from": "3", "to": "5"},
-                                {"from": "4", "to": "5"}
-                            ]
-                        }
+    def _call_llm(self):
+        relavent_info = self._get_relavent_info()  # FIXED: no arguments
 
-        prompt_notRoadmap = f"""
-                Given the question and the knowledge with respect to the question,
-                answer as if you're the best career coach in IT sector jobs.
-                Remember: The answer you provided should be in a conversational/message, 
-                short and covers the context and the information you provide should be
-                subjected to the Relevent Information otherwise return that you don't know the answer and 
-                Question:
-                {self.user_query}
+        llm = LLM()
+        query_classifier = self.classify_query_hybrid(self.user_query)
 
-                Relevant Information:
-                {relavent_info}
+        example_json_map = {
+            "title": "Data Scientist Roadmap",
+            "nodes": [
+                {"id": "1", "label": "Learn Python"},
+                {"id": "2", "label": "Learn Statistics"},
+                {"id": "3", "label": "Master Pandas & NumPy"},
+                {"id": "4", "label": "Learn Machine Learning"},
+                {"id": "5", "label": "Build Projects"}
+            ],
+            "edges": [
+                {"from": "1", "to": "3"},
+                {"from": "2", "to": "4"},
+                {"from": "3", "to": "5"},
+                {"from": "4", "to": "5"}
+            ]
+        }
 
-                Output:
-                """
-                
-        prompt_Roadmap=f"""return only the Json graph representation in form of {example_json_map} 
-                        for the user query {self.user_query} and the relavent information is {relavent_info}"""
-                        
-        llm=LLM()
-        query_classifier=self.classify_query_hybrid(self.user_query)
-        if query_classifier=='Roadmap':
-            output=llm.llm.invoke(prompt_Roadmap)
-            out=output.content.strip("```json\n")
-            print(out)
+        if query_classifier == 'Roadmap':
+            prompt_Roadmap = f"""return only the Json graph representation in form of {example_json_map} 
+                            for the user query {self.user_query} and the relavent information is {relavent_info}"""
+            output = llm.llm.invoke(prompt_Roadmap)
+            return output.content.strip("```json\n")
+
         else:
-            output=llm.llm.invoke(prompt_notRoadmap)
-            print(output.content)
+            prompt_notRoadmap = f"""
+            Given the question and the knowledge with respect to the question,
+            answer as if you're the best career coach in IT sector jobs and the answer should be as if your messaging a person, short and correct.
+            Question: {self.user_query}
+            Relevant Information: {relavent_info}
+            """
+            output = llm.llm.invoke(prompt_notRoadmap)
+            return output.content
+
             
             
     
