@@ -12,7 +12,8 @@ CORS(app, resources={
     r"/*": {
         "origins": [
             "https://ai-career-coach-frontend-six.vercel.app",
-            "http://localhost:5173"
+            "http://localhost:5173/",
+            "http://localhost:517"
         ]
     }
 }, supports_credentials=True)
