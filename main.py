@@ -7,11 +7,14 @@ import sys
 from io import StringIO
 
 app = Flask(__name__)
-allowed_origins = [
-    "https://ai-career-coach-frontend-six.vercel.app",
-    "http://localhost:5173"  
-]
-CORS(app, origins=allowed_origins)
+CORS(app, resources={
+    r"/*": {
+        "origins": [
+            "https://ai-career-coach-frontend-six.vercel.app",
+            "http://localhost:5173"
+        ]
+    }
+}, supports_credentials=True)
 
 @app.route('/ask', methods=['POST'])
 def ask_coach():
