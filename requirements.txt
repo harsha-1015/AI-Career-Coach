@@ -12,7 +12,7 @@ pinecone
 dotenv
 transformers
 accelerate
-torch
 sentencepiece
 Flask 
 Flask-Cors
+gunicorn
