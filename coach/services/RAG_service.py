@@ -65,14 +65,4 @@ class RAG:
             Relevant Information: {relavent_info}
             """
             output = llm.llm.invoke(prompt_notRoadmap)
-            return output.content
-
-            
-            
-    
-
-
-    
-    
-
-    
+            return output.content 
