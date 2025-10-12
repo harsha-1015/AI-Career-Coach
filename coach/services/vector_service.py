@@ -2,7 +2,7 @@ from pinecone import Pinecone
 from .embedding_service import Embed
 import os
 from ..config import VECTOR_DB_KEY, VECTOR_DB_HOST
-    
+
 class Vectors:
     def __init__(self,index):
         self.index=index
@@ -13,7 +13,7 @@ class Vectors:
         
         
     def _get_vec_docs(self):
-        embed=Embed()
+        
         vec,docs=embed._get_parseData()
         return (vec,docs)
     
@@ -37,6 +37,7 @@ class Vectors:
 
 pc = Pinecone(api_key=VECTOR_DB_KEY)
 index=pc.Index(host=VECTOR_DB_HOST)
+embed=Embed()  
 v=Vectors(index)
 
 

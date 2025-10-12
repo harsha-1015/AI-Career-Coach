@@ -2,9 +2,15 @@ import json
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from coach.services.RAG_service import RAG
+from pinecone import Pinecone
+from coach.config import VECTOR_DB_KEY, VECTOR_DB_HOST
+import time
 import ast
 
+pc = Pinecone(api_key=VECTOR_DB_KEY)
+index=pc.Index(host=VECTOR_DB_HOST)
 rag = RAG()
+
 app = Flask(__name__)
 allowed_origins = [
     "https://ai-career-coach-frontend-six.vercel.app",
@@ -22,7 +28,7 @@ def ask_coach():
 
     try:
         rag._get_user_query(user_query)
-        output = rag._call_llm()  # directly get the returned value
+        output=rag._call_llm(index)
 
         # Try to parse as JSON or Python dict
         try:
@@ -48,3 +54,17 @@ def ask_test():
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5000)
+    
+    # start=time.time()
+    
+    # end=time.time()
+    # print("\ninitial loading time is=",end-start)
+    
+    # user=input("enter the query: ")
+    # start=time.time()
+    
+    
+    # end=time.time()
+    # print("\n")
+    # print("time taken=",end-start)
+    
