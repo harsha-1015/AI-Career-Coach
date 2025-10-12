@@ -44,7 +44,7 @@ def ask_coach():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/test', methods=['GET'])
+@app.route('/', methods=['GET'])
 def ask_test():
     try:
         response = "The app is working fine"
