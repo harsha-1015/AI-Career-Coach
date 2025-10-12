@@ -10,9 +10,6 @@ pymupdf
 faiss-cpu
 pinecone
 dotenv
-transformers
-accelerate
-sentencepiece
 Flask 
 Flask-Cors
 gunicorn
