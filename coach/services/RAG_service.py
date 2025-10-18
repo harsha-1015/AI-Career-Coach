@@ -2,7 +2,7 @@ from .retrival_service import Retrival
 from .llm_service import LLM
 
 llm=LLM()
-class RAG:
+class RAG():
     def __init__(self):
         self.user_query=None
         
@@ -41,7 +41,7 @@ class RAG:
         }
 
         if query_classifier == 'Roadmap':
-            prompt_Roadmap = f"""return only the Json graph representation in form of {example_json_map} 
+            prompt_Roadmap = f"""return only the Json graph representation in form of {example_json_map} generate the nodes and edgens need in this maner
                             for the user query {self.user_query} and the relavent information is {relavent_info}"""
             output = llm.llm.invoke(prompt_Roadmap)
             return output.content.strip("```json\n")
