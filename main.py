@@ -33,6 +33,23 @@ def is_roadmap_format(data):
         return "nodes" in data and "edges" in data and "title" in data
     return False
 
+def format_chat_history(messages):
+    """Format chat history for the RAG service"""
+    history = []
+    for msg in messages:
+        # Skip roadmap visualizations in history, just include a reference
+        if msg.get("type") == "roadmap":
+            history.append({
+                "role": msg["role"],
+                "content": "[Roadmap visualization was generated]"
+            })
+        else:
+            history.append({
+                "role": msg["role"],
+                "content": msg["content"]
+            })
+    return history
+
 def create_roadmap_visualization(roadmap_data):
     """Create an interactive roadmap visualization using HTML and vis.js"""
     title = roadmap_data.get("title", "Learning Roadmap")
@@ -172,9 +189,20 @@ if prompt := st.chat_input("What would you like to know about your career?"):
             try:
                 start_time = time.time()
                 
-                # Get response from RAG
+                # Format chat history for RAG
+                chat_history = format_chat_history(st.session_state.messages[:-1])  # Exclude current message
+                
+                # Get response from RAG with history
                 rag._get_user_query(prompt)
-                output = rag._call_llm(index)
+                
+                # Pass chat history to the LLM call
+                # Assuming your RAG service supports a history parameter
+                # If not, you may need to modify the RAG service
+                try:
+                    output = rag._call_llm(index, history=chat_history)
+                except TypeError:
+                    # Fallback if history parameter is not supported
+                    output = rag._call_llm(index)
                 
                 # Try to parse as JSON or Python dict
                 response_data = None
@@ -243,6 +271,7 @@ with st.sidebar:
     st.markdown("This AI Career Coach uses RAG (Retrieval-Augmented Generation) to provide personalized career advice.")
     st.markdown("- Ask general questions for text responses")
     st.markdown("- Ask for a roadmap to see an interactive visualization")
+    st.markdown("- Chat history is maintained during your session")
     
     if st.session_state.messages:
         st.markdown("---")
