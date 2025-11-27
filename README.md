@@ -1,1 +1,1 @@
-deployed link: https://aicareer.streamlit.app/
+deployed link: https://ai-careercoach.streamlit.app/
